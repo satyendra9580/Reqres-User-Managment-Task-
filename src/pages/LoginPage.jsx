@@ -8,13 +8,13 @@ const LoginPage = () => {
         textAlign: 'center', 
         marginTop: '50px',
         marginBottom: '20px',
-        color: '#000080' // Navy Blue color
+        color: '#000080' 
       }}>
-      User Management <span style={{ color: '#138808' }}>System</span>
+        User Management <span style={{ color: '#138808' }}>System</span>
       </h1>
       
       <div style={{ textAlign: 'center', marginBottom: '30px', fontSize: '16px', color: '#555' }}>
-        A simple and powerful way to manage your users with an Indian touch
+        A simple and powerful way to manage users.
       </div>
       
       <LoginForm />

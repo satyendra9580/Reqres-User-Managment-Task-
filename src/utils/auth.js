@@ -1,9 +1,17 @@
+
+(function clearInitialToken() {
+  localStorage.removeItem('token');
+})();
+
 export const isAuthenticated = () => {
-  return localStorage.getItem('token') !== null;
+  const token = localStorage.getItem('token');
+  return token !== null && token !== '';
 };
 
 export const setToken = (token) => {
-  localStorage.setItem('token', token);
+  if (token) {
+    localStorage.setItem('token', token);
+  }
 };
 
 export const getToken = () => {
@@ -12,6 +20,11 @@ export const getToken = () => {
 
 export const removeToken = () => {
   localStorage.removeItem('token');
+};
+
+export const initAuth = () => {
+  removeToken();
+  return true; 
 };
 
 export const logout = () => {

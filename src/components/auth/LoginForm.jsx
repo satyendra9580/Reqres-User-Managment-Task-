@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { login } from '../../services/api';
-import { setToken } from '../../utils/auth';
+import { setToken, removeToken } from '../../utils/auth';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('eve.holt@reqres.in');
   const [password, setPassword] = useState('cityslicka');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    removeToken();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,10 +21,15 @@ const LoginForm = () => {
       setLoading(true);
       const data = await login({ email, password });
       
-      if (data.token) {
+      if (data && data.token) {
         setToken(data.token);
         toast.success('Login successful!');
-        navigate('/users');
+        
+        setTimeout(() => {
+          navigate('/users');
+        }, 300);
+      } else {
+        toast.error('Authentication failed. Please try again.');
       }
     } catch (error) {
       console.error('Login error:', error);
