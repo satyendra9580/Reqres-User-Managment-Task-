@@ -3,6 +3,27 @@ import { toast } from 'react-toastify';
 import { getUsers, deleteUser } from '../../services/api';
 import UserEditModal from './UserEditModal';
 
+const indianFirstNames = [
+  "Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", 
+  "Reyansh", "Ayaan", "Divya", "Neha", "Ananya", 
+  "Diya", "Saanvi", "Rajesh", "Sunil", "Vikram"
+];
+
+const indianLastNames = [
+  "Sharma", "Patel", "Singh", "Kumar", "Gupta", 
+  "Verma", "Joshi", "Rao", "Malhotra", "Reddy", 
+  "Kapoor", "Agarwal", "Shah", "Mehta", "Chopra"
+];
+
+const getIndianName = (id) => {
+  const firstNameIndex = id % indianFirstNames.length;
+  const lastNameIndex = (id * 2) % indianLastNames.length;
+  return {
+    first_name: indianFirstNames[firstNameIndex],
+    last_name: indianLastNames[lastNameIndex]
+  };
+};
+
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +37,19 @@ const UserList = () => {
     try {
       setLoading(true);
       const response = await getUsers(page);
-      setUsers(response.data);
+      
+      const usersWithIndianNames = response.data.map(user => {
+        const indianName = getIndianName(user.id);
+        return {
+          ...user,
+          first_name: indianName.first_name,
+          last_name: indianName.last_name,
+          original_first_name: user.first_name,
+          original_last_name: user.last_name
+        };
+      });
+      
+      setUsers(usersWithIndianNames);
       setTotalPages(response.total_pages);
       setCurrentPage(page);
     } catch (error) {
@@ -48,6 +81,7 @@ const UserList = () => {
         await deleteUser(userId);
         toast.success('User deleted successfully');
         
+        // Client-side update: Remove user from the list
         setUsers(users.filter(user => user.id !== userId));
       } catch (error) {
         console.error('Error deleting user:', error);
@@ -94,43 +128,45 @@ const UserList = () => {
         <p>Loading users...</p>
       ) : (
         <>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Avatar</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td>
-                    <img src={user.avatar} alt={`${user.first_name}'s avatar`} className="avatar" />
-                  </td>
-                  <td>{user.first_name}</td>
-                  <td>{user.last_name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleEdit(user)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Avatar</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <img src={user.avatar} alt={`${user.first_name}'s avatar`} className="avatar" />
+                    </td>
+                    <td>{user.first_name}</td>
+                    <td>{user.last_name}</td>
+                    <td>{user.email}</td>
+                    <td className="action-buttons">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(user)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div className="pagination">
             <button

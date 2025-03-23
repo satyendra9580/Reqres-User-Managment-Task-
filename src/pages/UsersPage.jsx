@@ -13,13 +13,7 @@ const UsersPage = () => {
 
   return (
     <>
-      <div style={{ 
-        backgroundColor: '#f8f9fa', 
-        padding: '10px 20px', 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <div className="navbar">
         <h3>Reqres User Management</h3>
         <button className="btn btn-danger" onClick={handleLogout}>
           Logout

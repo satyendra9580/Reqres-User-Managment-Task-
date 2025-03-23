@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { updateUser } from '../../services/api';
 import { toast } from 'react-toastify';
 
+const indianFirstNames = [
+  "Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", 
+  "Reyansh", "Ayaan", "Divya", "Neha", "Ananya", 
+  "Diya", "Saanvi", "Rajesh", "Sunil", "Vikram"
+];
+
+const indianLastNames = [
+  "Sharma", "Patel", "Singh", "Kumar", "Gupta", 
+  "Verma", "Joshi", "Rao", "Malhotra", "Reddy", 
+  "Kapoor", "Agarwal", "Shah", "Mehta", "Chopra"
+];
+
 const UserEditModal = ({
   user,
   show,
@@ -12,6 +24,8 @@ const UserEditModal = ({
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionType, setSuggestionType] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -53,6 +67,20 @@ const UserEditModal = ({
     }
   };
 
+  const selectName = (name, type) => {
+    if (type === 'first') {
+      setFirstName(name);
+    } else {
+      setLastName(name);
+    }
+    setShowSuggestions(false);
+  };
+
+  const showNameSuggestions = (type) => {
+    setSuggestionType(type);
+    setShowSuggestions(true);
+  };
+
   if (!show) {
     return null;
   }
@@ -84,23 +112,43 @@ const UserEditModal = ({
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="firstName">First Name</label>
-            <input
-              type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <button 
+                type="button" 
+                className="btn btn-sm" 
+                style={{ position: 'absolute', right: '5px', top: '12px', padding: '2px 8px', fontSize: '12px' }}
+                onClick={() => showNameSuggestions('first')}
+              >
+                Suggestions
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label htmlFor="lastName">Last Name</label>
-            <input
-              type="text"
-              id="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+              <button 
+                type="button" 
+                className="btn btn-sm" 
+                style={{ position: 'absolute', right: '5px', top: '12px', padding: '2px 8px', fontSize: '12px' }}
+                onClick={() => showNameSuggestions('last')}
+              >
+                Suggestions
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -112,12 +160,41 @@ const UserEditModal = ({
               required
             />
           </div>
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+
+          {showSuggestions && (
+            <div className="suggestions-container" style={{ 
+              marginBottom: '15px', 
+              border: '1px solid #ddd', 
+              padding: '10px', 
+              borderRadius: '4px',
+              maxHeight: '150px',
+              overflowY: 'auto'
+            }}>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
+                Select a {suggestionType === 'first' ? 'first' : 'last'} name:
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                {(suggestionType === 'first' ? indianFirstNames : indianLastNames).map((name, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="btn btn-sm"
+                    style={{ margin: '3px', padding: '3px 8px', fontSize: '12px' }}
+                    onClick={() => selectName(name, suggestionType === 'first' ? 'first' : 'last')}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <button 
               type="button" 
               className="btn" 
               onClick={onClose}
-              style={{ marginRight: '10px' }}
+              style={{ marginRight: '10px', marginBottom: '10px' }}
             >
               Cancel
             </button>
